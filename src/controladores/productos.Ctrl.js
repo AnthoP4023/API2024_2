@@ -79,6 +79,12 @@ export const putProductos = async (req, res) => {
         const { id } = req.params;
         const { prod_codigo, prod_nombre, prod_stock, prod_precio, prod_activo, prod_imagen } = req.body;
 
+        // Verificar si el producto existe en la base de datos
+        const [productExists] = await conmysql.query('SELECT * FROM productos WHERE prod_id = ?', [id]);
+        if (productExists.length === 0) {
+            return res.status(404).json({ message: 'Producto no encontrado' });
+        }
+
         let newProd_imagen = prod_imagen; // Si ya se pasó una URL de imagen, la usaremos
 
         // Verificar si se subió una nueva imagen
