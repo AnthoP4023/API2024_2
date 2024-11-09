@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const corsOptions={
-    origin:'*',//la direccion ip del servidor
+    origin:'http://localhost:8100',//la direccion ip del servidor
     methods:['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     cedentials:true
 }
