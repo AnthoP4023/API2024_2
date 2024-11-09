@@ -46,7 +46,7 @@ export const postProducto = async (req, res) => {
             // Subir la imagen a Cloudinary
             const uploadResult = await cloudinary.uploader.upload(req.file.path, {
                 folder: 'uploads', // Puedes agregar un folder en Cloudinary si lo deseas
-                public_id: ${Date.now()}-${req.file.originalname} // Usamos el timestamp para garantizar un nombre único
+                public_id: `${Date.now()}-${req.file.originalname}` // Usamos el timestamp para garantizar un nombre único
             });
 
             console.log("Resultado de la carga en Cloudinary:", uploadResult);
