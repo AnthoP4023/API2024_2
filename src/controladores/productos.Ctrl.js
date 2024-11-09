@@ -34,7 +34,6 @@ async(req, res)=>{
 
 export const postProducto = async (req, res) => {
     try {
-        // Verificar si los datos del producto están presentes
         const { prod_codigo, prod_nombre, prod_stock, prod_precio, prod_activo } = req.body;
         console.log("Datos recibidos del cuerpo:", req.body);
 
@@ -45,13 +44,12 @@ export const postProducto = async (req, res) => {
             console.log("Imagen recibida:", req.file);
             // Subir la imagen a Cloudinary
             const uploadResult = await cloudinary.uploader.upload(req.file.path, {
-                folder: 'uploads', // Puedes agregar un folder en Cloudinary si lo deseas
-                public_id: `${Date.now()}-${req.file.originalname}` // Usamos el timestamp para garantizar un nombre único
+                folder: 'uploads',
+                public_id: `${Date.now()}-${req.file.originalname}`
             });
 
             console.log("Resultado de la carga en Cloudinary:", uploadResult);
-            // Obtener la URL segura de la imagen subida
-            prod_imagen = uploadResult.secure_url;
+            prod_imagen = uploadResult.secure_url; // Asignar la URL de Cloudinary
         } else {
             console.log("No se recibió ninguna imagen.");
         }
@@ -64,10 +62,11 @@ export const postProducto = async (req, res) => {
 
         console.log("Producto insertado con ID:", rows.insertId);
 
-        // Responder con el id del producto insertado
+        // Responder con el id del producto insertado y la URL de la imagen
         res.status(201).json({
             mensaje: 'Producto guardado correctamente.',
-            prod_id: rows.insertId
+            prod_id: rows.insertId,
+            prod_imagen: prod_imagen // Se incluye la URL de la imagen (si existe)
         });
 
     } catch (error) {
@@ -75,6 +74,7 @@ export const postProducto = async (req, res) => {
         return res.status(500).json({ message: 'Error del lado del servidor', error: error.message });
     }
 };
+
 
 
 
