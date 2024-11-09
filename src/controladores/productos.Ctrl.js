@@ -46,7 +46,7 @@ export const postProducto = async (req, res) => {
             // Subir la imagen a Cloudinary
             const uploadResult = await cloudinary.uploader.upload(req.file.path, {
                 folder: 'uploads', // Puedes agregar un folder en Cloudinary si lo deseas
-                public_id: `${Date.now()}-${req.file.originalname}` // Usamos el timestamp para garantizar un nombre único
+                public_id: ${Date.now()}-${req.file.originalname} // Usamos el timestamp para garantizar un nombre único
             });
 
             console.log("Resultado de la carga en Cloudinary:", uploadResult);
@@ -65,13 +65,18 @@ export const postProducto = async (req, res) => {
         console.log("Producto insertado con ID:", rows.insertId);
 
         // Responder con el id del producto insertado
-        res.status(201).json({ id: rows.insertId });
+        res.status(201).json({
+            mensaje: 'Producto guardado correctamente.',
+            prod_id: rows.insertId
+        });
 
     } catch (error) {
         console.error("Error al crear el producto:", error);
         return res.status(500).json({ message: 'Error del lado del servidor', error: error.message });
     }
 };
+
+
 
 // Ruta PUT para actualizar un producto
 export const putProductos = async (req, res) => {
