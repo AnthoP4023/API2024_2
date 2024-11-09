@@ -117,28 +117,29 @@ export const putProductos = async (req, res) => {
 
 
 
-export const patchProductos = async (req, res) => {
+export const putProductos = async (req, res) => {
     try {
         const { id } = req.params;
-        const { prod_codigo, prod_nombre, prod_stock, prod_precio, prod_activo } = req.body;
+        const { prod_codigo, prod_nombre, prod_stock, prod_precio, prod_activo, prod_imagen } = req.body;
 
-        // Obtener la nueva imagen si se envía; si no, se conserva la actual
-        let prod_imagen = req.body.prod_imagen;
+        let newProd_imagen = prod_imagen; // Si ya se pasó una URL de imagen, la usaremos
 
+        // Verificar si se subió una nueva imagen
         if (req.file) {
             // Subir la nueva imagen a Cloudinary
             const uploadResult = await cloudinary.uploader.upload(req.file.path, {
                 folder: 'uploads',
-                public_id: `${Date.now()}-${req.file.originalname}` // Usar un nombre único
+                public_id: ${Date.now()}-${req.file.originalname} // Usar un nombre único
             });
 
             // Obtener la URL segura de la imagen subida
-            prod_imagen = uploadResult.secure_url;
+            newProd_imagen = uploadResult.secure_url;
         }
 
+        // Actualizar el producto en la base de datos
         const [result] = await conmysql.query(
-            'UPDATE productos SET prod_codigo = IFNULL(?, prod_codigo), prod_nombre = IFNULL(?, prod_nombre), prod_stock = IFNULL(?, prod_stock), prod_precio = IFNULL(?, prod_precio), prod_activo = IFNULL(?, prod_activo), prod_imagen = IFNULL(?, prod_imagen) WHERE prod_id = ?',
-            [prod_codigo, prod_nombre, prod_stock, prod_precio, prod_activo, prod_imagen, id]
+            'UPDATE productos SET prod_codigo = ?, prod_nombre = ?, prod_stock = ?, prod_precio = ?, prod_activo = ?, prod_imagen = ? WHERE prod_id = ?',
+            [prod_codigo, prod_nombre, prod_stock, prod_precio, prod_activo, newProd_imagen, id]
         );
 
         if (result.affectedRows <= 0) {
@@ -147,10 +148,12 @@ export const patchProductos = async (req, res) => {
             });
         }
 
+        // Obtener el producto actualizado
         const [rows] = await conmysql.query('SELECT * FROM productos WHERE prod_id = ?', [id]);
         res.json(rows[0]);
 
     } catch (error) {
+        console.error(error);
         return res.status(500).json({ message: 'Error del lado del servidor' });
     }
 };
